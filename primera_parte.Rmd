@@ -1,0 +1,317 @@
+---
+title: "primera_parte"
+output: html_document
+date: "2023-01-29"
+---
+
+# ANTECEDENTES
+
+El sector Minería e Hidrocarburos, con una ponderación de 80% - 20% respectivamente, influye positivamente en la generación de las divisas necesarias para mantener un equilibrio macroeconómico. Debido a la representatividad del sector minería, éste representa una de las más importante fuentes de ingreso de nuestra economía, siendo uno de los sectores que mayor aporta al PBI nacional.
+
+Dicho sector ha experimentado incrementos y contracciones debido a las fluctuaciones en sus dos subsectores, Minería e Hidrocarburos, ya sea por mayor o menor producción de los principales metales o por una mayor o menor explotación de sus más representativos productos, respectivamente. 
+
+Con base en el Informe Panorama de la Economía Peruana 1950-2021 del INEI, entre el 2009 y 2018, periodo de análisis del presente trabajo aplicativo integrador, la extracción de petróleo, gas, minerales y servicios conexos fue una de las actividades económicas que más aportó, en términos de porcentajes, al PBI (a precios constantes).
+
++---------------+---------------------------------------------------+
+| Año           | Aporte de la actividad extractiva  al PBI (en %)  |
++===============+===================================================+
+| 2009          | 14.2                                              |
++---------------+---------------------------------------------------+
+| 2010          | 13.2                                              |
++---------------+---------------------------------------------------+
+| 2011          | 12.5                                              |
++---------------+---------------------------------------------------+
+| 2012          | 12.0                                              |
++---------------+---------------------------------------------------+
+| 2013          | 11.9                                              |
++---------------+---------------------------------------------------+
+| 2014          | 11.4                                              |
++---------------+---------------------------------------------------+
+| 2015          | 12.0                                              |
++---------------+---------------------------------------------------+
+| 2016          | 13.0                                              |
++---------------+---------------------------------------------------+
+| 2017          | 13.1                                              |
++---------------+---------------------------------------------------+
+| 2018          | 12.4                                              |
++---------------+---------------------------------------------------+
+__Fuente: Instituto Nacional de Estadística e Informática__
+
+
+Asimismo, de acuerdo a los Informes Técnicos de Producción Nacional del INEI, en cuanto a la contribución de la actividad económica minería e hidrocarburos en la variación de la Producción Nacional en términos porcentuales, durante el periodo 2009 al 2018, la misma se presentó del siguiente modo: 
+
++---------------+---------------------------------------------------------------+
+| Año           | Aporte de la actividad extractiva  a la variación PBI (en %)  |
++===============+===============================================================+
+| 2009          |  0.02                                                         |
++---------------+---------------------------------------------------------------+
+| 2010          | -0.04                                                         |
++---------------+---------------------------------------------------------------+
+| 2011          | -0.01                                                         |
++---------------+---------------------------------------------------------------+
+| 2012          |  0.10                                                         |
++---------------+---------------------------------------------------------------+
+| 2013          |  0.13                                                         |
++---------------+---------------------------------------------------------------+
+| 2014          |  -0.9                                                         |
++---------------+---------------------------------------------------------------+
+| 2015          |  1.04                                                         |
++---------------+---------------------------------------------------------------+
+| 2016          |  1.94                                                         |
++---------------+---------------------------------------------------------------+
+| 2017          |  0.42                                                         |
++---------------+---------------------------------------------------------------+
+| 2018          | -0.17                                                         |
++---------------+---------------------------------------------------------------+
+__Fuente: Instituto Nacional de Estadística e Informática__
+
+
+Los principales metales del Subsector Minería son: Cobre, Oro, Plata, Hierro, Plomo, Molibdeno, Zinc y Hierro. Por otro lado, para el Subsector Hidrocarburos sus principales productos son: Petróleo crudo y Gas natural
+Es importante resaltar que desde Julio del 2017, el INEI publica trimestralmente un Informe Técnico titulado “Indicador de la Actividad Productiva Departamental”, en donde se refleja la variación % de un trimestre de un año en particular comparado con el mismo trimestre del año anterior, así como la incidencia que cada sector de la economía tiene en la actividad productiva departamental. En promedio, los departamentos de Loreto, Ayacucho, Áncash e Ica son los que representan una mayor variación en la producción minera y de hidrocarburos. 
+
+# OBJETIVOS
+
+* Explorar de manera gráfica el impacto de la minería sobre los gastos e ingresos a nivel de gobiernos regionales.
+* Considerar en la exploración las trayectorias a través del tiempo y las diversas modalidades de ingresos y gastos. 
+
+
+# PLANTEAMIENTO DEL PROBLEMA
+
+Determinar el impacto de la minería sobre los gastos e ingresos a nivel de gobiernos regionales en el periodo 2009 – 2018, de manera gráfica y en consideración de las trayectorias a través del tiempo y las diversas modalidades de ingresos y gastos. 
+
+*	Consulta Amigable SIAF: Ingreso y Gasto Público Se tomo la información sobre los ingresos y gastos con sus respectivos tipos del Sistema integrado de Administración Financiera (SIAF) a través de los datos del QLAB. 
+*	MINEM: Producción mineral metálico e Hidrocarburos regional.
+
+Se tomó información sobre la producción de minerales e hidrocarburos del Perú 
+La base de datos tiene una periodicidad desde el año 2009 hasta el 2018 de cual se tiene una desagregación a nivel regional. El tipo de base de datos panel está en formato Long.
+La medida de los datos es de moneda nacional en nuevos soles y para el caso de los minerales e hidrocarburos los valores son a precios constantes. Además, las variables son numéricas (float) con excepción a la que corresponde la región.
+
+
+# PROCESAMIENTO Y ANÁLISIS GRÁFICO
+
+## CARGAR LOS DATOS
+
+Importar librerias
+
+```{r}
+library(tidyverse)
+library(readr)
+library(gganimate)
+```
+
+Cargar los datos
+
+```{r}
+data <- read.csv("data.csv")
+```
+
+Creación de variables adicionales
+
+
+```{r}
+data <- data |> 
+  filter(region_minera == 1 | region_hidro == 1) |> 
+  mutate(prod = Cobre + Arsenico + Bismuto + Cadmio +
+                Estaño + Magneso + Molibdeno + Oro +
+                Plata + Plomo + Zinc + GasNatural+
+                LiquidoGasNatural + PetroleoCrudo,
+         prod_min = Cobre + Arsenico + Bismuto + 
+                    Cadmio + Estaño + Magneso + 
+                    Molibdeno + Oro + Plata +
+                    Zinc + Hierro,
+         prod_hid = GasNatural + LiquidoGasNatural +
+                    PetroleoCrudo)
+```
+
+
+## VARIABLES FISCALES Y DE PRODUCCIÓN POR REGIONES
+
+### Producción de minerales por región 
+
+```{r echo=TRUE}
+data |> mutate(prod__min_miles = prod_min/1000000) |> 
+  filter(region_minera == "1") |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = prod__min_miles, 
+      fill = prod__min_miles) +
+  geom_col() +
+  scale_fill_distiller(palette = "Reds", direction = 1,
+                       limits = c(min(-2000), max(20000))) +
+  theme_minimal() +
+  facet_wrap(~region, scales = "free_x") +
+  theme(axis.text.x = element_text(size = 6, angle = 35, face = "bold"),
+        strip.text = element_text(size = 7, face ="bold"),
+        strip.background = element_rect(fill = "grey"),
+        axis.line = element_line(linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "white")) +
+  ggtitle("Producción de minerales por región, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("Producción en millones de soles") +
+  labs(fill = "Producción en \nnmillones de soles") +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+### Producción de hidrocarburos por región 
+
+```{r echo=FALSE}
+data |> mutate(prod__hid_miles = prod_hid/1000000) |> 
+  filter(region_hidro == "1") |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = prod__hid_miles, 
+      fill = prod__hid_miles) +
+  geom_col() +
+  scale_fill_distiller(palette = "Greys", direction = 1,
+                       limits = c(min(-2000), max(10000))) +
+  theme_minimal() +
+  facet_wrap(~region, scales = "free_x") +
+  theme(axis.text.x = element_text(size = 6, angle = 35, face = "bold"),
+        strip.text = element_text(size = 7, face ="bold"),
+        strip.background = element_rect(fill = "grey"),
+        axis.line = element_line(linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "white")) +
+  ggtitle("Producción de minerales por región, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("PIM de millones de soles") +
+  labs(fill = "Producción en \nmillones de soles") +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+### Presupuesto Institucional de Apertura proveniente del Canon
+
+```{r echo=FALSE}
+data |> mutate(canonmineropia_mill = canonmineropia/1000000) |> 
+  filter(region_minera == 1 | region_hidro == 1) |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = canonmineropia_mill, 
+      fill = canonmineropia_mill) +
+  geom_col() +
+  scale_fill_distiller(palette = "Greens", direction = 1,
+                       limits = c(min(-100), max(400))) +
+  theme_minimal() +
+  facet_wrap(~region, scales = "free_x") +
+  theme(axis.text.x = element_text(size = 5, angle = 35, face = "bold"),
+        strip.text = element_text(size = 7, face ="bold"),
+        strip.background = element_rect(fill = "grey"),
+        axis.line = element_line(linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "white")) +
+  ggtitle("PIA proveniente del Canon por region, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("PIA en miles de millones de soles") +
+  labs(fill = "PIA en millones de soles") +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+
+### Presupuesto Institucional Modificado proveniente del Canon
+
+```{r echo=FALSE}
+data |> mutate(canonmineropim_mill = canonmineropim/1000000) |> 
+  filter(region_minera == 1 | region_hidro == 1) |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = canonmineropim_mill, 
+      fill = canonmineropim_mill) +
+  geom_col() +
+  scale_fill_distiller(palette = "Purples", direction = 1,
+                       limits = c(min(-100), max(400))) +
+  theme_minimal() +
+  facet_wrap(~region, scales = "free_x") +
+  theme(axis.text.x = element_text(size = 5, angle = 35, face = "bold"),
+        strip.text = element_text(size = 7, face ="bold"),
+        strip.background = element_rect(fill = "grey"),
+        axis.line = element_line(linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "white")) +
+  ggtitle("PIM proveniente del Canon por region, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("PIM en miles de millones de soles") +
+  labs(fill = "PIM en millones de soles") +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+### Total recaudado
+
+
+```{r echo=FALSE}
+data |> mutate(totalrevenue_mill = totalrevenue/1000000) |> 
+  filter(region_minera == 1 | region_hidro == 1) |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = totalrevenue_mill, 
+      fill = totalrevenue_mill) +
+  geom_col() +
+  scale_fill_distiller(palette = "Blues", direction = 1,
+                       limits = c(min(-100), max(2000))) +
+  theme_minimal() +
+  facet_wrap(~region, scales = "free_x") +
+  theme(axis.text.x = element_text(size = 5, angle = 35, face = "bold"),
+        strip.text = element_text(size = 7, face ="bold"),
+        strip.background = element_rect(fill = "grey"),
+        axis.line = element_line(linewidth = 0.5),
+        panel.grid.major.y = element_line(color = "white")) +
+  ggtitle("Total recaudado por region, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("Total recaudado en miles de millones de soles") +
+  labs(fill = "Total recaudado en \nmiles de millones de soles") +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+
+## PRODUCCIÓN MINERA VERSUS PRODUCCIÓN DE HIDROCARBUROS
+
+Creamos un subset de la data con las columnas: year, prod, prod_min y prod_hid
+
+```{r}
+subset <- data |> 
+          select(year, prod, prod_min, prod_hid) |> 
+          group_by(year) |> 
+          summarise_all(sum)
+```
+
+
+Hacemos un reshape: de formato wide a long
+
+```{r warning=FALSE}
+subset <- subset |> 
+          reshape(idvar = "year",
+                  varying = c("prod_min", "prod_hid"),
+                  v.name = c("value"),
+                  times = c("prod_min", "prod_hid"),
+                  new.row.names = 1:10000,
+                  direction = "long")
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE, paged.print=FALSE}
+subset |> 
+  ggplot() +
+  aes(x = year,
+      y = value,
+      fill = time) +
+  geom_bar(position = "fill",
+           stat = "identity") +
+  ggtitle("Valor en soles de la producción de minerales \ne hidrocarburos, 2009 - {closest_state}") +
+  xlab("Años") + 
+  ylab("Porcentaje") +
+  labs(fill = "Minería vs. \nHidrocarburos") +
+  scale_fill_discrete(labels=c('Hidrocarburos', 'Minerales')) +
+  theme_minimal() +
+  theme(plot.title = element_text(hjust = 0.5)) +
+  transition_states(year, wrap = FALSE) +
+  shadow_mark()
+```
+
+
+
+

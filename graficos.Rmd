@@ -1,0 +1,264 @@
+---
+title: "Untitled"
+output: html_document
+date: "2023-01-27"
+---
+
+Importar librerias
+
+```{r}
+library(tidyverse)
+library(readr)
+```
+
+Cargar los datos
+
+```{r}
+data <- read.csv("data.csv")
+```
+
+
+
+```{r}
+data <- data |> 
+  mutate(prod = Cobre + Arsenico +
+                Bismuto + Cadmio +
+                Estaño + Magneso +
+                Molibdeno + Oro +
+                Plata + Plomo + 
+                Zinc + GasNatural+
+                LiquidoGasNatural +
+                PetroleoCrudo)
+```
+
+
+
+```{r}
+data |> 
+  filter(region_minera == "1") |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year) +
+  aes(y = prod) +
+  geom_col() +
+  facet_wrap(~region)
+```
+
+
+
+```{r}
+library(gganimate)
+library(glue)
+```
+
+
+
+```{r}
+data |> 
+  filter(region_minera == "1") |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year) +
+  aes(y = prod) +
+  aes(fill = region) +
+  geom_col(show.legend = F) +
+  labs(x = "Años",
+       y = "Producción minera y de hidrocarburos",
+       tittle = "Series de tiempo de producción minera y de hidrocarburos por regiones",
+       subtitle = "Region: {closest_state}") +
+  transition_states(region, state_length = 2)
+```
+
+
+```{r}
+data |> 
+  filter(region_minera == "1") |> 
+  group_by(year) |> 
+  ggplot() +
+  aes(x = year,
+      y = prod,
+      color = region) +
+#  aes(fill = region) +
+  geom_point(show.legend = F) +
+  labs(x = "Años",
+       y = "Producción minera y de hidrocarburos",
+       tittle = "Series de tiempo de producción minera y de hidrocarburos por regiones",
+       subtitle = "Region: {closest_state}") +
+  facet_wrap(~region)
+```
+
+
+
+```{r}
+p <-  data |> 
+      filter(region_minera == "1") |> 
+      group_by(year) |> 
+      ggplot() +
+      aes(x = year,
+          y = prod, 
+          fill = prod) +
+      geom_col() +
+      scale_fill_distiller(palette = "Reds", direction = 1) +
+      theme_minimal() +
+      facet_wrap(~region, scales= "free_x") +
+      theme(axis.text.x = element_text(size= 6, angle= 35, face="bold"),
+            strip.text = element_text(size = 7, face="bold"),
+            strip.background =element_rect(fill="grey"),
+            axis.line = element_line(linewidth = 0.5)) +
+      ggtitle("Producción de minerales e hidrocarburos por región {closest_state} \n") +
+      xlab("Años") + 
+      ylab("Producción") +
+      labs(fill = "Producción") +
+      transition_states(year, wrap = FALSE) +
+      shadow_mark()
+#      labs(tittle = "Producción de minerales e hidrocarburos por región")
+p
+```
+
+
+
+
+
+
+
+
+
+
+```{r}
+p <-  data |> 
+      filter(region_minera == "1") |> 
+      group_by(year) |> 
+      ggplot() +
+      aes(x = year,
+          y = prod, 
+          fill = prod) +
+      geom_col() +
+      scale_fill_distiller(palette = "Reds", direction = 1) +
+      theme_minimal() +
+      theme(axis.text.x = element_text(size=8, angle=45),
+            strip.text = element_text(size = 8, face="bold")) +
+      facet_wrap(~region) +
+      transition_states(year, wrap = FALSE) +
+      shadow_mark()
+#anim_save("first.gif", p)
+p
+```
+
+
+
+
+```{r}
+p <- ggplot(mean.temp, aes(Month, Temp, fill = Temp)) +
+  geom_col() +
+  scale_fill_distiller(palette = "Reds", direction = 1) +
+  theme_minimal() +
+  theme(
+    panel.grid = element_blank(),
+    panel.grid.major.y = element_line(color = "white"),
+    panel.ontop = TRUE
+  )
+p
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+data <- data |>
+        filter(region_minera == "1") |> 
+        group_by(year) |> 
+        mutate(rank = dense_rank(desc(prod))) 
+```
+
+
+
+
+```{r}
+data |>
+  filter(region_minera == "1") |> 
+  group_by(year) |> 
+  mutate(rank = dense_rank(desc(prod))) |> 
+  ggplot() +
+  aes(x = prod) +
+  aes(y = rank) +
+  geom_col()
+```
+
+
+```{r}
+data |>
+  ggplot(aes(prod, rank)) + 
+  geom_col(aes(fill = region)) +
+  transition_states(year, transition_length = 1)
+```
+
+
+
+```{r}
+gdp_ranked %>%
+  # gganimate uses the `group` aesthetic to track objects across frames
+  ggplot(aes(gdp, rank, group = country)) + 
+  geom_col(aes(fill = country)) +
+  transition_states(year, transition_length = 5)
+```
+
+
+
+
+
+
+
+
+```{r}
+data |>
+  filter(region_minera == "1") |> 
+  ggplot() +
+  aes(x = prod) +
+  aes(y = rank) +
+  geom_col()
+
+
+
+(aes(gdp, rank, group = country)) +
+  geom_col(aes(fill = country)) +
+  geom_text(
+    aes(x = -200, label = country),
+    hjust = 1, size = 14/.pt
+  ) +
+  xlim(-7000, 23000) +
+  labs(title = "year: {closest_state}") +
+  theme_minimal_vgrid(14, rel_small = 1) +
+  theme(
+    axis.text.y = element_blank(),
+    axis.title.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.line.y = element_blank()
+  ) + 
+  guides(fill = "none") +
+  transition_states(year, transition_length = 5)
+```
+
+
+
+
+
+
+
+
+
+
+
+
